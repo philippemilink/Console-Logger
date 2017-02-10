@@ -14,11 +14,11 @@ function init()
 
 function end()
 {
-    first_line=$(grep -ne "^$0 init$"  ~/.bash_history | tail -n1)
+    first_line=$(egrep -n "consolelogger(.sh)? init$"  ~/.bash_history | tail -n1)
 
     if [[ $first_line == '' ]]
     then
-	echo "You must first run '$0 init'"
+	   echo "You must first run '$0 init'"
 	exit
     fi
 
