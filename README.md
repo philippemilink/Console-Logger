@@ -11,7 +11,7 @@ Edit your `~/.bash_profile` file and add these lines:
 shopt -s histappend
 PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
 
-export PATH=[folder where you clone]Console-Logger:$PATH
+alias='. [folder where you clone]Console-Logger/consolelogger.sh'
 ```
 
 Load this file with `source ~/.bash_profile` or restart your shell.
