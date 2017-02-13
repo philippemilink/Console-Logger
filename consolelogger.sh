@@ -58,27 +58,14 @@ function end()
 			      
         if [ $writing -eq 1 ]
         then
-            if [[ ${line} =~ ^[[:print:]]*consolelogger(.sh)?[[:space:]]comment[[:space:]]([[:print:]]*$) ]]
+            if [[ ${line} =~ ^[[:print:]]*consolelogger(.sh)?[[:space:]]comment[[:space:]]([[:print:]]*)$ ]]
             then
                 echo ${BASH_REMATCH[2]} >> $1
-            else
-                if [[ ${line:0:1} == "c" && ${line:1:1} == "d" ]]
-                then
-                    if [[ ${#line} -gt 2 ]]
-                    then
-                        if [[ ${line:2:1} != " " ]]
-                        then
-                            # Not cd command:
-                            echo ${directories[$current_directory]}:$line >> $1
-                        else
-                            current_directory=$((current_directory+1))
-                        fi
-                    else
-                        current_directory=$((current_directory+1))
-                    fi
-                else
-                    echo ${directories[$current_directory]}:$line >> $1
-                fi
+            elif [[ ${line} =~ ^cd([[:space:]][[:print:]]*)?$ ]]
+	    then
+		current_directory=$((current_directory+1))
+	    else
+		echo ${directories[$current_directory]}:$line >> $1
             fi
         fi
 
