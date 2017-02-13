@@ -50,9 +50,11 @@ function end()
         i=$(($i+1))
     done < ~/.consolelogger_directories
 
-    current_directory=1
+    current_directory=1;
+    in_code=0;
+    wrote=0;
 
-    cat ~/.bash_history | while read line
+    while read line
     do
         count=$((count+1));
 			      
@@ -60,12 +62,25 @@ function end()
         then
             if [[ ${line} =~ ^[[:print:]]*consolelogger(.sh)?[[:space:]]comment[[:space:]]([[:print:]]*)$ ]]
             then
+		if [ $in_code -eq 1 ]
+		then
+		    echo \`\`\` >> $1
+		    in_code=0;
+		fi
                 echo ${BASH_REMATCH[2]} >> $1
+		wrote=1;
             elif [[ ${line} =~ ^cd([[:space:]][[:print:]]*)?$ ]]
 	    then
 		current_directory=$((current_directory+1))
 	    else
-		echo ${directories[$current_directory]}:$line >> $1
+		if [ $in_code -eq 0 ]
+		then
+		    echo \`\`\`shell >> $1;
+		    in_code=1;
+		fi
+		
+		echo ${directories[$current_directory]}:$line >> $1;
+		wrote=1;
             fi
         fi
 
@@ -73,7 +88,12 @@ function end()
         then
             writing=1;
         fi
-    done
+    done < ~/.bash_history
+
+    if [[ $wrote -eq 1 && $in_code -eq 1 ]]
+    then
+	echo \`\`\` >> $1;
+    fi
 
     alias cd='\cd'
     rm ~/.consolelogger_directories
