@@ -3,9 +3,10 @@
 
 function print_commands()
 {
-    echo -e "           init  start the logging";
-    echo -e " end [filename]  end the logging in save commands in filename";
-    echo -e " cd [directory]  move to the directory"
+    echo -e "              init  start the logging";
+    echo -e "    end [filename]  end the logging in save commands in filename";
+    echo -e "    cd [directory]  move to the directory"
+    echo -e " comment [comment]  add a comment"
 }
 
 function alias_cd()
@@ -57,22 +58,27 @@ function end()
 			      
         if [ $writing -eq 1 ]
         then
-            if [[ ${line:0:1} == "c" && ${line:1:1} == "d" ]]
+            if [[ ${line} =~ ^[[:print:]]*consolelogger(.sh)?[[:space:]]comment[[:space:]]([[:print:]]*$) ]]
             then
-                if [[ ${#line} -gt 2 ]]
+                echo ${BASH_REMATCH[2]} >> $1
+            else
+                if [[ ${line:0:1} == "c" && ${line:1:1} == "d" ]]
                 then
-                    if [[ ${line:2:1} != " " ]]
+                    if [[ ${#line} -gt 2 ]]
                     then
-                        # Not cd command:
-                        echo ${directories[$current_directory]}:$line >> $1
+                        if [[ ${line:2:1} != " " ]]
+                        then
+                            # Not cd command:
+                            echo ${directories[$current_directory]}:$line >> $1
+                        else
+                            current_directory=$((current_directory+1))
+                        fi
                     else
                         current_directory=$((current_directory+1))
                     fi
                 else
-                    current_directory=$((current_directory+1))
+                    echo ${directories[$current_directory]}:$line >> $1
                 fi
-            else
-                echo ${directories[$current_directory]}:$line >> $1
             fi
         fi
 
@@ -106,6 +112,9 @@ then
 elif [[ $1 == 'cd' ]]
 then
     changedirectory $2
+elif [[ $1 == 'comment' && $# -ge 2 ]]
+then
+    echo "Comment added"
 else
     echo "Unknown command"
     print_commands
