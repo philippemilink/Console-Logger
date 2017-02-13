@@ -97,7 +97,7 @@ if [ $# -eq 0 ]
 then
     echo "Console Logger - a tool to log commands put in a shell"
     print_commands
-    return 0
+    return
 fi
 
 
